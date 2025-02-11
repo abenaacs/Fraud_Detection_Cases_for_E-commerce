@@ -3,6 +3,7 @@ from data_cleaner import DataCleaner
 from feature_engineer import FeatureEngineer
 from model_builder import ModelBuilder
 from mlflow_utils import setup_mlflow
+from explainability import Explainability
 
 
 def main():
@@ -57,10 +58,43 @@ def main():
     print("Fraud Data Results:")
     for model, metrics in fraud_results.items():
         print(f"{model}: {metrics}")
-
     print("\nCredit Card Data Results:")
     for model, metrics in creditcard_results.items():
         print(f"{model}: {metrics}")
+
+    # Step 10: Explain the best-performing model for Fraud Data
+    best_fraud_model_name = max(
+        fraud_results, key=lambda x: fraud_results[x]["f1_score"]
+    )
+    best_fraud_model = fraud_model_builder.models[best_fraud_model_name]
+    print(f"\nBest Fraud Model: {best_fraud_model_name}")
+
+    fraud_explainer = Explainability(
+        model=best_fraud_model,
+        X_train=fraud_model_builder.X_train,
+        X_test=fraud_model_builder.X_test,
+        feature_names=fraud_model_builder.X_train.columns,
+    )
+    fraud_explainer.explain_with_shap()
+    fraud_explainer.explain_with_lime()
+    print("SHAP and LIME explanations generated for Fraud Data.")
+
+    # Step 11: Explain the best-performing model for Credit Card Data
+    best_creditcard_model_name = max(
+        creditcard_results, key=lambda x: creditcard_results[x]["f1_score"]
+    )
+    best_creditcard_model = creditcard_model_builder.models[best_creditcard_model_name]
+    print(f"\nBest Credit Card Model: {best_creditcard_model_name}")
+
+    creditcard_explainer = Explainability(
+        model=best_creditcard_model,
+        X_train=creditcard_model_builder.X_train,
+        X_test=creditcard_model_builder.X_test,
+        feature_names=creditcard_model_builder.X_train.columns,
+    )
+    creditcard_explainer.explain_with_shap()
+    creditcard_explainer.explain_with_lime()
+    print("SHAP and LIME explanations generated for Credit Card Data.")
 
 
 if __name__ == "__main__":
