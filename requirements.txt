@@ -1,4 +1,18 @@
+# Data handling and analysis
 pandas==1.5.3
 numpy==1.23.5
+
+# Visualization
 matplotlib==3.7.1
 seaborn==0.12.2
+
+# Machine learning
+scikit-learn==1.2.2
+mlflow==2.9.1
+
+# Model explainability
+shap==0.44.1
+lime==0.2.0.1
+
+# Testing
+unittest==0.1.0
