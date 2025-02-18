@@ -16,6 +16,9 @@ def main():
 
     # Step 2: Load datasets
     fraud_df = loader.load_fraud_data()
+    # Compute correlation with the target variable
+    correlation = fraud_df.corr(numeric_only=True)["class"].sort_values(ascending=False)
+    print(correlation)
     ip_country_df = loader.load_ip_country_data()
     creditcard_df = loader.load_creditcard_data()
 
@@ -29,8 +32,21 @@ def main():
     engineer = FeatureEngineer()
     fraud_df = engineer.add_time_features(fraud_df)
     fraud_df = engineer.merge_with_geolocation(fraud_df, ip_country_df)
+    # Drop unnecessary columns (timestamps and others not needed for modeling)
+    fraud_df = FeatureEngineer.drop_unnecessary_columns(
+        fraud_df,
+        columns_to_drop=[
+            "signup_time",
+            "purchase_time",
+            "device_id",
+            "ip_address",
+            "lower_bound_ip_address",
+            "upper_bound_ip_address",
+        ],
+    )
+
     fraud_df = engineer.encode_categorical_features(
-        fraud_df, ["source", "browser", "sex"]
+        fraud_df, ["source", "browser", "sex", "country"]
     )
 
     # Step 5: Save cleaned and processed data
