@@ -14,8 +14,13 @@ class Explainability:
 
     def explain_with_shap(self):
         # Initialize SHAP explainer
-        explainer = shap.Explainer(self.model, self.X_train)
+        # Generate SHAP values
+        explainer = shap.Explainer(self.model)
+        shap_values = explainer(self.X_train)
         shap_values = explainer(self.X_test)
+
+        # Create a force plot
+        shap.plots.force(explainer.expected_value[0], shap_values[0])
 
         # Summary Plot
         shap.summary_plot(
