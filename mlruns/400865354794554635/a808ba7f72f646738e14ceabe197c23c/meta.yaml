@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/hp/Desktop/Academic_Folders/Kifiya%20AI%20Mastery/week%208/Fraud_Detection_Cases_for_E-commerce/mlruns/400865354794554635/a808ba7f72f646738e14ceabe197c23c/artifacts
+end_time: 1739871155520
+entry_point_name: ''
+experiment_id: '400865354794554635'
+lifecycle_stage: active
+run_id: a808ba7f72f646738e14ceabe197c23c
+run_name: MLP
+run_uuid: a808ba7f72f646738e14ceabe197c23c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1739871121851
+status: 3
+tags: []
+user_id: hp

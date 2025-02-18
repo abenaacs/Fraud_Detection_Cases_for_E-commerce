@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/hp/Desktop/Academic_Folders/Kifiya%20AI%20Mastery/week%208/Fraud_Detection_Cases_for_E-commerce/mlruns/400865354794554635/e71abc84864841f5b5c5232109fc8731/artifacts
+end_time: 1739871061167
+entry_point_name: ''
+experiment_id: '400865354794554635'
+lifecycle_stage: active
+run_id: e71abc84864841f5b5c5232109fc8731
+run_name: Decision Tree
+run_uuid: e71abc84864841f5b5c5232109fc8731
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1739871054679
+status: 3
+tags: []
+user_id: hp

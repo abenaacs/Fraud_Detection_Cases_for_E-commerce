@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/hp/Desktop/Academic_Folders/Kifiya%20AI%20Mastery/week%208/Fraud_Detection_Cases_for_E-commerce/mlruns/400865354794554635/c62e5d500f7146faaccd1553110e942d/artifacts
+end_time: 1739870041802
+entry_point_name: ''
+experiment_id: '400865354794554635'
+lifecycle_stage: active
+run_id: c62e5d500f7146faaccd1553110e942d
+run_name: Logistic Regression
+run_uuid: c62e5d500f7146faaccd1553110e942d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1739870041447
+status: 4
+tags: []
+user_id: hp

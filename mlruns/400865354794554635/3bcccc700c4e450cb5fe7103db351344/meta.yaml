@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/hp/Desktop/Academic_Folders/Kifiya%20AI%20Mastery/week%208/Fraud_Detection_Cases_for_E-commerce/mlruns/400865354794554635/3bcccc700c4e450cb5fe7103db351344/artifacts
+end_time: 1739875287517
+entry_point_name: ''
+experiment_id: '400865354794554635'
+lifecycle_stage: active
+run_id: 3bcccc700c4e450cb5fe7103db351344
+run_name: Gradient Boosting
+run_uuid: 3bcccc700c4e450cb5fe7103db351344
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1739871534529
+status: 3
+tags: []
+user_id: hp
