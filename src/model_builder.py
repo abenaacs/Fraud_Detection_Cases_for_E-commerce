@@ -43,6 +43,10 @@ class ModelBuilder:
         for model_name, model in self.models.items():
             with mlflow.start_run(run_name=model_name):
                 # Train the model
+                print("X_train columns:", self.X_train.columns)
+                print("X_train data types:\n", self.X_train.dtypes)
+                print("Columns with missing values:")
+                print(self.X_train.isnull().sum())
                 model.fit(self.X_train, self.y_train)
                 y_pred = model.predict(self.X_test)
 
