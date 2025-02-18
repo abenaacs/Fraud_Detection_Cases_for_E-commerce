@@ -1,6 +1,6 @@
 # Fraud Detection Project
 
-This repository contains the code and documentation for improving fraud detection in e-commerce and banking transactions. The project focuses on preprocessing transaction data, engineering features, building machine learning models, explaining predictions using SHAP and LIME, and deploying the solution for real-time fraud detection.
+This repository contains the code and documentation for improving fraud detection in e-commerce and banking transactions. The project focuses on preprocessing transaction data, engineering features, building machine learning models, explaining predictions using SHAP and LIME, deploying the solution as a Flask API for real-time fraud detection, and visualizing insights through an interactive Dash dashboard.
 
 ---
 
@@ -14,15 +14,17 @@ This repository contains the code and documentation for improving fraud detectio
 6. [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
 7. [Model Building and Training](#model-building-and-training)
 8. [Model Explainability](#model-explainability)
-9. [Running Tests](#running-tests)
-10. [Contributing](#contributing)
-11. [License](#license)
+9. [Model Deployment and API Development](#model-deployment-and-api-development)
+10. [Dashboard Development](#dashboard-development)
+11. [Running Tests](#running-tests)
+12. [Contributing](#contributing)
+13. [License](#license)
 
 ---
 
 ## Overview
 
-The goal of this project is to create accurate and robust fraud detection models for e-commerce and banking transactions. The solution leverages geolocation analysis, transaction pattern recognition, and advanced machine learning techniques to identify fraudulent activities.
+The goal of this project is to create accurate and robust fraud detection models for e-commerce and banking transactions. The solution leverages geolocation analysis, transaction pattern recognition, advanced machine learning techniques, and real-time deployment to identify fraudulent activities.
 
 Key tasks include:
 
@@ -30,7 +32,8 @@ Key tasks include:
 - Engineering features such as time-based features and geolocation mapping.
 - Building and training machine learning models.
 - Explaining model predictions using SHAP and LIME.
-- Evaluating model performance and deploying it for real-time fraud detection.
+- Deploying the trained model as a Flask API for real-time fraud detection.
+- Visualizing fraud insights using an interactive Dash dashboard.
 
 ---
 
@@ -44,6 +47,9 @@ fraud_detection/
 │   ├── IpAddress_to_Country.csv  # IP address to country mapping
 │   └── creditcard.csv        # Bank transaction data
 │
+├── models/                   # Trained machine learning models
+│   └── fraud_detection_model.pkl
+│
 ├── src/                      # Source code for data processing, modeling, and explainability
 │   ├── __init__.py           # Package initialization
 │   ├── data_loader.py        # Module for loading datasets
@@ -52,7 +58,8 @@ fraud_detection/
 │   ├── model_builder.py      # Module for model building and evaluation
 │   ├── mlflow_utils.py       # Module for MLflow integration
 │   ├── explainability.py     # Module for SHAP and LIME explainability
-│   └── main.py               # Main script to execute the pipeline
+│   ├── serve_model.py        # Flask API for serving the model
+│   └── dashboard.py          # Dash dashboard for visualizing fraud insights
 │
 ├── tests/                    # Unit tests for modules
 │   ├── test_data_loader.py   # Tests for data loader
@@ -64,6 +71,7 @@ fraud_detection/
 ├── notebooks/                # Jupyter Notebooks for exploratory data analysis
 │   └── exploratory_data_analysis.ipynb  # Notebook for EDA
 │
+├── Dockerfile                # Docker configuration for Flask API
 ├── requirements.txt          # List of Python dependencies
 └── README.md                 # This file
 ```
@@ -86,6 +94,8 @@ pip install -r requirements.txt
 - `scikit-learn`: For machine learning algorithms and evaluation metrics.
 - `mlflow`: For experiment tracking and model versioning.
 - `shap` and `lime`: For model explainability.
+- `flask`: For serving the trained model as an API.
+- `dash`: For building interactive dashboards.
 - `unittest`: For unit testing.
 
 ---
@@ -167,6 +177,47 @@ mlflow ui
 
 Access the dashboard at `http://localhost:5000`.
 
+### Step 6: Deploy the Flask API
+
+1. Start the Flask API:
+
+   ```bash
+   python src/serve_model.py
+   ```
+
+   The API will be available at `http://localhost:5000`.
+
+2. Test the `/predict` endpoint:
+   Use `curl` or Postman to send a POST request:
+
+   ```bash
+   curl -X POST http://localhost:5000/predict \
+   -H "Content-Type: application/json" \
+   -d '{"features": [0.1, 0.2, 0.3, 0.4, 0.5]}'
+   ```
+
+3. Dockerize the API:
+   Build and run the Docker container:
+   ```bash
+   docker build -t fraud-detection-api .
+   docker run -p 5000:5000 fraud-detection-api
+   ```
+
+### Step 7: Launch the Dash Dashboard
+
+1. Start the Dash app:
+
+   ```bash
+   python src/dashboard.py
+   ```
+
+   The dashboard will be available at `http://localhost:8050`.
+
+2. Explore the dashboard:
+   - Summary boxes display total transactions, fraud cases, and fraud percentages.
+   - Line charts show fraud trends over time.
+   - Bar charts analyze fraud cases by device, browser, and geography.
+
 ---
 
 ## Exploratory Data Analysis (EDA)
@@ -200,6 +251,26 @@ Explainability outputs are saved in the root directory:
 
 - SHAP visualizations: `shap_summary_plot.png`, `shap_force_plot.png`, `shap_dependence_plot.png`.
 - LIME explanation: `lime_explanation.html`.
+
+---
+
+## Model Deployment and API Development
+
+The `serve_model.py` script serves the trained model using Flask. Key features include:
+
+- A `/predict` endpoint for real-time fraud detection.
+- Logging to track incoming requests, errors, and fraud predictions.
+- Dockerized deployment for scalability and portability.
+
+---
+
+## Dashboard Development
+
+The `dashboard.py` script creates an interactive dashboard using Dash. Key features include:
+
+- Summary boxes displaying total transactions, fraud cases, and fraud percentages.
+- Line charts showing fraud trends over time.
+- Bar charts analyzing fraud cases by device, browser, and geography.
 
 ---
 
@@ -254,18 +325,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 - Thanks to Adey Innovations Inc. for providing the datasets and business context.
 - Special thanks to the open-source community for tools like Pandas, NumPy, Matplotlib, Scikit-learn, SHAP, and LIME.
-
----
-
-### Notes
-
-1. **Reproducibility**: Ensure that all dependencies are installed using `requirements.txt` to avoid compatibility issues.
-2. **MLflow Dashboard**: Start the MLflow UI to view experiment results:
-
-   ```bash
-   mlflow ui
-   ```
-
-   Access the dashboard at `http://localhost:5000`.
-
-3. **Explainability Outputs**: SHAP and LIME visualizations are saved in the root directory for easy access.
