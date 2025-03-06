@@ -23,6 +23,15 @@ logger.addHandler(handler)
 # Initialize Flask app
 app = Flask(__name__)
 
+# Configure Redis
+redis_host = os.getenv("REDIS_HOST", "localhost")
+redis_port = int(os.getenv("REDIS_PORT", 6379))
+cache = redis.Redis(host=redis_host, port=redis_port)
+
+# Configure JWT
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "default-secret-key")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+jwt = JWTManager(app)
 
 # Load model
 model_path = os.getenv("MODEL_PATH", "models/fraud_detection_model.pkl")
@@ -88,6 +97,28 @@ def predict():
     except Exception as e:
         logger.error(f"Prediction error: {str(e)}", exc_info=True)
         return jsonify({"error": "Prediction failed"}), 500
+
+
+@app.route("/login", methods=["POST"])
+def login():
+    try:
+        auth = request.authorization
+        if not auth:
+            return jsonify({"error": "Missing credentials"}), 401
+
+        if auth.username == os.getenv("ADMIN_USER") and auth.password == os.getenv(
+            "ADMIN_PASSWORD"
+        ):
+            access_token = create_access_token(identity=auth.username)
+            logger.info(f"Successful login for user: {auth.username}")
+            return jsonify(access_token=access_token)
+
+        logger.warning(f"Failed login attempt from IP: {request.remote_addr}")
+        return jsonify({"error": "Invalid credentials"}), 401
+
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}", exc_info=True)
+        return jsonify({"error": "Authentication failed"}), 500
 
 
 if __name__ == "__main__":
