@@ -1,74 +1,98 @@
 import logging
+import os
 from flask import Flask, request, jsonify
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token
+from datetime import timedelta
 import joblib
 import pandas as pd
+import redis
+import json
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logger = logging.getLogger(__name__)
+log_file = os.getenv("LOG_FILE", "audit.log")
+handler = logging.FileHandler(log_file)
+formatter = logging.Formatter("%(asctime)s - %(user)s - %(ip)s - %(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
+# Initialize Flask app
 app = Flask(__name__)
 
-# Load the trained model
-model = joblib.load("models/fraud_detection_model.pkl")
+
+# Load model
+model_path = os.getenv("MODEL_PATH", "models/fraud_detection_model.pkl")
+model = joblib.load(model_path)
+
+
+@app.before_request
+def log_request_info():
+    try:
+        user = get_jwt().get("identity", "anonymous")
+    except:
+        user = "anonymous"
+
+    logger.info(
+        "Request received",
+        extra={
+            "user": user,
+            "ip": request.remote_addr,
+            "endpoint": request.endpoint,
+            "method": request.method,
+            "content_length": request.content_length,
+        },
+    )
 
 
 @app.route("/predict", methods=["POST"])
+@jwt_required()
 def predict():
     try:
-        # Parse JSON input
         data = request.json
-        features = data["features"]
-        logging.info(f"Received request with features: {features}")
+        features = data.get("features")
 
-        # Convert to DataFrame
+        # Enhanced logging
+        logger.info(f"Received prediction request with features: {features}")
+
         df = pd.DataFrame([features])
+        data_str = json.dumps(df.to_dict(orient="records")[0])
 
-        # Make prediction
+        # Check cache
+        cached_result = cache.get(data_str)
+        if cached_result:
+            logger.info("Cache hit")
+            return jsonify(
+                {"prediction": int(cached_result.decode()), "source": "cache"}
+            )
+
+        # Model prediction
         prediction = model.predict(df)[0]
-        probability = model.predict_proba(df)[0][1]  # Probability of fraud
+        probability = model.predict_proba(df)[0][1]
 
-        # Log prediction
-        logging.info(f"Prediction: {prediction}, Probability: {probability}")
+        # Cache result
+        cache.setex(data_str, 3600, str(prediction))
 
-        return jsonify(
-            {"prediction": int(prediction), "probability": float(probability)}
-        )
-    except Exception as e:
-        logging.error(f"Error during prediction: {str(e)}")
-        return jsonify({"error": str(e)}), 400
-
-
-@app.route("/fraud-insights", methods=["GET"])
-def fraud_insights():
-    try:
-        # Load processed data
-        fraud_data = pd.read_csv("data/processed_fraud_data.csv")
-
-        # Summary statistics
-        total_transactions = len(fraud_data)
-        fraud_cases = fraud_data["class"].sum()
-        fraud_percentage = (fraud_cases / total_transactions) * 100
-
-        # Trends over time
-        fraud_data["purchase_time"] = pd.to_datetime(fraud_data["purchase_time"])
-        fraud_trends = fraud_data.groupby(fraud_data["purchase_time"].dt.date)[
-            "class"
-        ].sum()
-
+        logger.info(f"Prediction: {prediction}, Probability: {probability}")
         return jsonify(
             {
-                "total_transactions": total_transactions,
-                "fraud_cases": int(fraud_cases),
-                "fraud_percentage": round(fraud_percentage, 2),
-                "fraud_trends": fraud_trends.to_dict(),
+                "prediction": int(prediction),
+                "probability": float(probability),
+                "source": "model",
             }
         )
+
     except Exception as e:
-        logging.error(f"Error fetching fraud insights: {str(e)}")
-        return jsonify({"error": str(e)}), 400
+        logger.error(f"Prediction error: {str(e)}", exc_info=True)
+        return jsonify({"error": "Prediction failed"}), 500
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(
+        host=os.getenv("APP_HOST", "0.0.0.0"),
+        port=int(os.getenv("APP_PORT", 5000)),
+        debug=os.getenv("DEBUG_MODE", "False").lower() == "true",
+    )
