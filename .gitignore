@@ -1,4 +1,33 @@
-.git/
-env/
-data/
-__pycache__
+# Sensitive files
+.env
+*.key
+*.pem
+*.crt
+secrets.json
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Data & Models
+data/*.csv
+models/*.pkl
+mlruns/          # MLflow artifacts
+logs/            # Log files
+.ipynb_checkpoints/
+
+# IDE/OS-specific
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# Docker
+docker-compose.override.yml
+*.dockerignore
