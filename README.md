@@ -2,8 +2,6 @@
 
 This repository contains the code and documentation for improving fraud detection in e-commerce and banking transactions. The project focuses on preprocessing transaction data, engineering features, building machine learning models, explaining predictions using SHAP and LIME, deploying the solution as a Flask API for real-time fraud detection, and visualizing insights through an interactive Dash dashboard.
 
----
-
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -25,7 +23,6 @@ This repository contains the code and documentation for improving fraud detectio
 ## Overview
 
 The goal of this project is to create accurate and robust fraud detection models for e-commerce and banking transactions. The solution leverages geolocation analysis, transaction pattern recognition, advanced machine learning techniques, and real-time deployment to identify fraudulent activities.
-
 Key tasks include:
 
 - Preprocessing and cleaning transaction data.
@@ -34,8 +31,6 @@ Key tasks include:
 - Explaining model predictions using SHAP and LIME.
 - Deploying the trained model as a Flask API for real-time fraud detection.
 - Visualizing fraud insights using an interactive Dash dashboard.
-
----
 
 ## Directory Structure
 
@@ -76,8 +71,6 @@ fraud_detection/
 └── README.md                 # This file
 ```
 
----
-
 ## Dependencies
 
 Install the required dependencies using the following command:
@@ -98,31 +91,64 @@ pip install -r requirements.txt
 - `dash`: For building interactive dashboards.
 - `unittest`: For unit testing.
 
----
+### Resolving Dependency Conflicts
+
+The project includes `faust` and `flask`, which have conflicting dependencies on the `click` library. To resolve this conflict, you can either downgrade `flask` to a version compatible with `click<8.0` or replace `faust` with an alternative library.
+
+#### Option 1: Downgrade `flask`
+
+Update your `requirements.txt` to use a compatible version of `flask`:
+
+```plaintext
+faust==1.10.4
+flask>=2.3.0,<3.0.0
+mlflow>=2.10.0
+```
+
+Then run:
+
+```bash
+pip install -r requirements.txt
+```
+
+#### Option 2: Remove or Replace `faust`
+
+If `faust` is not critical, you can remove it from your `requirements.txt`:
+
+```plaintext
+flask>=3.0.0
+mlflow>=2.10.0
+```
+
+Then run:
+
+```bash
+pip install -r requirements.txt
+```
 
 ## Setup Instructions
 
 1. **Clone the Repository**:
 
-   ```bash
-   git clone https://github.com/abenaacs/Fraud_Detection_Cases_for_E-commerce.git
-   cd Fraud_Detection_Cases_for_E-commerce
-   ```
+```bash
+git clone https://github.com/abenaacs/Fraud_Detection_Cases_for_E-commerce.git
+cd Fraud_Detection_Cases_for_E-commerce
+```
 
 2. **Install Dependencies**:
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install -r requirements.txt
+```
 
 3. **Prepare the Data**:
    Place your raw datasets (`Fraud_Data.csv`, `IpAddress_to_Country.csv`, and `creditcard.csv`) in the `data/` folder.
-
 4. **Generate Folder Structure** (if not already created):
    Run the `folder.py` script to generate the folder structure:
-   ```bash
-   python folder.py
-   ```
+
+```bash
+python folder.py
+```
 
 ---
 
@@ -181,44 +207,40 @@ Access the dashboard at `http://localhost:5000`.
 
 1. Start the Flask API:
 
-   ```bash
-   python src/serve_model.py
-   ```
+```bash
+python src/serve_model.py
+```
 
-   The API will be available at `http://localhost:5000`.
+The API will be available at `http://localhost:5000`. 2. Test the `/predict` endpoint:
+Use `curl` or Postman to send a POST request:
 
-2. Test the `/predict` endpoint:
-   Use `curl` or Postman to send a POST request:
-
-   ```bash
-   curl -X POST http://localhost:5000/predict \
-   -H "Content-Type: application/json" \
-   -d '{"features": [0.1, 0.2, 0.3, 0.4, 0.5]}'
-   ```
+```bash
+curl -X POST http://localhost:5000/predict \
+-H "Content-Type: application/json" \
+-d '{"features": [0.1, 0.2, 0.3, 0.4, 0.5]}'
+```
 
 3. Dockerize the API:
    Build and run the Docker container:
-   ```bash
-   docker build -t fraud-detection-api .
-   docker run -p 5000:5000 fraud-detection-api
-   ```
+
+```bash
+docker build -t fraud-detection-api .
+docker run -p 5000:5000 fraud-detection-api
+```
 
 ### Step 7: Launch the Dash Dashboard
 
 1. Start the Dash app:
 
-   ```bash
-   python src/dashboard.py
-   ```
+```bash
+python src/dashboard.py
+```
 
-   The dashboard will be available at `http://localhost:8050`.
+The dashboard will be available at `http://localhost:8050`. 2. Explore the dashboard:
 
-2. Explore the dashboard:
-   - Summary boxes display total transactions, fraud cases, and fraud percentages.
-   - Line charts show fraud trends over time.
-   - Bar charts analyze fraud cases by device, browser, and geography.
-
----
+- Summary boxes display total transactions, fraud cases, and fraud percentages.
+- Line charts show fraud trends over time.
+- Bar charts analyze fraud cases by device, browser, and geography.
 
 ## Exploratory Data Analysis (EDA)
 
@@ -228,8 +250,6 @@ The `exploratory_data_analysis.ipynb` notebook provides insights into the datase
 - Correlation between features.
 - Patterns in transaction amounts, times, and geolocations.
 
----
-
 ## Model Building and Training
 
 The `model_builder.py` script handles model selection, training, and evaluation. It includes:
@@ -238,21 +258,15 @@ The `model_builder.py` script handles model selection, training, and evaluation.
 - Evaluation metrics: Accuracy, Precision, Recall, F1-Score, ROC-AUC.
 - Experiment tracking with MLflow.
 
----
-
 ## Model Explainability
 
 The `explainability.py` script generates SHAP and LIME explanations for the best-performing models:
 
 - SHAP provides global and local interpretability (summary plot, force plot, dependence plot).
 - LIME explains individual predictions using interpretable surrogate models.
-
-Explainability outputs are saved in the root directory:
-
+  Explainability outputs are saved in the root directory:
 - SHAP visualizations: `shap_summary_plot.png`, `shap_force_plot.png`, `shap_dependence_plot.png`.
 - LIME explanation: `lime_explanation.html`.
-
----
 
 ## Model Deployment and API Development
 
@@ -261,8 +275,6 @@ The `serve_model.py` script serves the trained model using Flask. Key features i
 - A `/predict` endpoint for real-time fraud detection.
 - Logging to track incoming requests, errors, and fraud predictions.
 - Dockerized deployment for scalability and portability.
-
----
 
 ## Dashboard Development
 
@@ -292,36 +304,36 @@ python tests/test_model_builder.py
 python tests/test_explainability.py
 ```
 
----
-
 ## Contributing
 
 We welcome contributions to improve the project! To contribute:
 
 1. Fork the repository.
 2. Create a new branch for your feature or bug fix:
-   ```bash
-   git checkout -b feature-name
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m "Add feature or fix"
-   ```
-4. Push your changes to GitHub:
-   ```bash
-   git push origin feature-name
-   ```
-5. Open a pull request describing your changes.
 
----
+```bash
+git checkout -b feature-name
+```
+
+3. Commit your changes:
+
+```bash
+git commit -m "Add feature or fix"
+```
+
+4. Push your changes to GitHub:
+
+```bash
+git push origin feature-name
+```
+
+5. Open a pull request describing your changes.
 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
----
-
 ## Acknowledgments
 
-- Thanks to Adey Innovations Inc. for providing the datasets and business context.
+- Thanks to 10X Academy for providing the datasets and business context.
 - Special thanks to the open-source community for tools like Pandas, NumPy, Matplotlib, Scikit-learn, SHAP, and LIME.
